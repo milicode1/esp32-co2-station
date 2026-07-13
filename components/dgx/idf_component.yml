@@ -1,0 +1,45 @@
+dependencies:
+  idf:
+    version: '>=5.0.0'
+description: Display and graphics component for ESP32 with SPI, I2C, and parallel
+  display buses, virtual screens, drawing primitives, and fonts
+documentation: https://github.com/jef-sure/esp32-component-dgx/blob/main/README.md
+files:
+  exclude:
+  - build/**
+  - dist/**
+  - .git/**
+  - .github/**
+  - .vscode/**
+  - examples/**/build/**
+  - examples/**/managed_components/**
+  - examples/**/dependencies.lock
+  - examples/**/sdkconfig
+  - examples/**/sdkconfig.old
+  - '**/*.old'
+  include:
+  - idf_component.yml
+  - Kconfig
+  - src/**/*.c
+  - include/**/*.h
+  - CMakeLists.txt
+  - font2c/**/*
+  - README.md
+  - CHANGES.md
+  - LICENSE
+issues: https://github.com/jef-sure/esp32-component-dgx/issues
+license: MIT
+maintainers:
+- Anton Petrusevich <anton.petrusevich.mobile@gmail.com>
+repository: https://github.com/jef-sure/esp32-component-dgx.git
+tags:
+- display
+- graphics
+- lcd
+- oled
+- spi
+- i2c
+- framebuffer
+- font
+url: https://github.com/jef-sure/esp32-component-dgx
+version: 0.0.12

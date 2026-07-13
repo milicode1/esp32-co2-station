@@ -1,0 +1,10 @@
+## IDF Component Manager Manifest File
+dependencies:
+  ## Required IDF version
+  idf:
+    version: '>=5.2.0'
+  dgx:
+    path: ../components/dgx
+  jef-sure/scd4x: '*'
+  espressif/qrcode: '*'
+
