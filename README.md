@@ -47,7 +47,7 @@
     git clone https://github.com/jef-sure/esp32-co2-station.git
     cd esp32-co2-station-main
 
-### 3. Скачать графическую библиотеку dgx 
+### 3. Скачивание графической библиотеки dgx 
      https://components.espressif.com/components/jef-sure/dgx/versions/0.0.12
 
     Содержимое поместить в папку проекта 
