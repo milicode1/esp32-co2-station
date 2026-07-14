@@ -4,7 +4,9 @@
 ## 📌 Описание проекта
 
 Проект представляет собой индикатор качества воздуха на базе **ESP32-C3-ZERO** с дисплеем **GC9A01**, датчиком CO2 **SCD41** и "физической" кнопкой для управления. 
+При попытке сборки "из коробки" возник ряд сложностей.
 Ниже приведены изменения/настройки при которых проект собирается.
+В данном репозитории все изменения уже сделаны, за исключением п.3.2 - исправление необходимо сделать после первого запуска сборки.
 
 ---
 
@@ -80,9 +82,22 @@
         Component config → DGX → Enable SPI transport
         Component config → DGX → Enable GC9a01_panel_driver
         Component config → DGX → Enable RAM-backed virtual_screen
+    
+    4.5. Выбрать Custom partition table CSV
+        Partition Table → Partition Table (Custom partition table CSV) → Custom partition table CSV
+         Убедиться что появился  пункт - в скобках имя вашего файла с настройками
+        Partition Table → (partitions.csv) Custom partition CSV file
 
-### 5. Настройка файла main/CMakeLists.txt
+### 5. Настройка файла main\idf_component.yml
+    dependencies:
+        idf:
+            version: '>=5.2.0'
+        dgx:
+            path: ../components/dgx
+        jef-sure/scd4x: '*'
+        espressif/qrcode: '*'
 
+### 6. Настройка файла main\CMakeLists.txt
     set(app_sources
         app_fonts.c
         app_mqtt.c
@@ -98,30 +113,32 @@
         SRCS ${app_sources}
         REQUIRES esp_event esp_wifi nvs_flash protocomm wifi_provisioning esp_event mbedtls esp_http_client esp_http_server esp_adc driver scd4x mqtt
         INCLUDE_DIRS "."
-        WHOLE_ARCHIVE ${CMAKE_BINARY_DIR}/components/dgx/libdgx.a ${CMAKE_BINARY_DIR}/esp-idf/bt/libbt.a
+        WHOLE_ARCHIVE 
+            ${CMAKE_BINARY_DIR}/components/dgx/libdgx.a 
+            ${CMAKE_BINARY_DIR}/esp-idf/bt/libbt.a
+            ${CMAKE_BINARY_DIR}/esp-idf/driver/libdriver.a
     )
 
     target_compile_options(${COMPONENT_LIB} PRIVATE -Os)
 
     # ... остальная часть файла без изменений ...
 
-### 6. Настройка partitions.csv
-
+### 7. Настройка partitions.csv
     Name,   Type, SubType, Offset,  Size, Flags
     nvs,      data, nvs,     ,        0x6000,
     phy_init, data, phy,     ,        0x1000,
     factory,  app,  factory, ,        0x3F0000,
 
-### 7. Сборка проекта
+### 8. Сборка проекта
     idf.py fullclean
+    Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue
     idf.py build
 
-### 8. Прошивка
+### 9. Прошивка
     idf.py -p COM10 flash
     Замените COM10 на ваш COM-порт.
 
-### 9. Мониторинг
-
+### 10. Мониторинг
     idf.py -p COM10 monitor
 
 
