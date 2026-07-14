@@ -6,7 +6,7 @@
 Проект представляет собой индикатор качества воздуха на базе **ESP32-C3-ZERO** с дисплеем **GC9A01**, датчиком CO2 **SCD41** и "физической" кнопкой для управления. 
 При попытке сборки "из коробки" возник ряд сложностей.
 Ниже приведены изменения/настройки при которых проект собирается.
-В данном репозитории все изменения уже сделаны, за исключением п.3.2 - исправление необходимо сделать после первого запуска сборки.
+В данном репозитории все изменения уже сделаны, за исключением п.4.2 - исправление необходимо сделать после первого запуска сборки.
 
 ---
 
@@ -47,8 +47,14 @@
     git clone https://github.com/jef-sure/esp32-co2-station.git
     cd esp32-co2-station-main
 
-### 3. Исправление компонентов под ESP-IDF v5.2
-    3.1. Исправление dgx (графическая библиотека)
+### 3. Скачать графическую библиотеку dgx 
+     https://components.espressif.com/components/jef-sure/dgx/versions/0.0.12
+
+    Содержимое поместить в папку проекта 
+     components/dgx
+
+### 4. Исправление компонентов под ESP-IDF v5.2
+    4.1. Исправление dgx (графическая библиотека)
         Файл: components/dgx/CMakeLists.txt
 
         Было:
@@ -57,7 +63,7 @@
         Стало:
             REQUIRES driver
 
-    3.2. Исправление scd4x (датчик CO2) - папка появляется при первой сборке "и сразу выпадает в ошибку"
+    4.2. Исправление scd4x (датчик CO2) - папка появляется при первой сборке "и сразу выпадает в ошибку"
         Файл: managed_components/jef-sure__scd4x/CMakeLists.txt
 
         Было:
@@ -66,29 +72,30 @@
         Стало:
             REQUIRES driver
 
-### 4. Настройка menuconfig
+### 5. Настройка menuconfig
     idf.py menuconfig
 
-    4.1. Настройка Bluetooth (NimBLE)
+    5.1. Настройка Bluetooth (NimBLE)
         Component config → Bluetooth → Host → NimBLE - BLE only
 
-    4.2. Настройка размера Flash
+    5.2. Настройка размера Flash
         Serial flasher config → Flash size → 4 MB
 
-    4.3. Оптимизация по размеру
+    5.3. Оптимизация по размеру
         Compiler options → Optimization Level → Release (-Os)
 
-    4.4. Включение драйверов DGX
+    5.4. Включение драйверов DGX
         Component config → DGX → Enable SPI transport
         Component config → DGX → Enable GC9a01_panel_driver
         Component config → DGX → Enable RAM-backed virtual_screen
     
-    4.5. Выбрать Custom partition table CSV
+    5.5. Выбрать Custom partition table CSV
         Partition Table → Partition Table (Custom partition table CSV) → Custom partition table CSV
+        
          Убедиться что появился  пункт (в скобках имя вашего файла с настройками)
         Partition Table → (partitions.csv) Custom partition CSV file
 
-### 5. Настройка файла main\idf_component.yml
+### 6. Настройка файла main\idf_component.yml
     dependencies:
         idf:
             version: '>=5.2.0'
@@ -97,7 +104,7 @@
         jef-sure/scd4x: '*'
         espressif/qrcode: '*'
 
-### 6. Настройка файла main\CMakeLists.txt
+### 7. Настройка файла main\CMakeLists.txt
     set(app_sources
         app_fonts.c
         app_mqtt.c
@@ -123,22 +130,22 @@
 
     # ... остальная часть файла без изменений ...
 
-### 7. Настройка partitions.csv
+### 8. Настройка partitions.csv
     Name,   Type, SubType, Offset,  Size, Flags
     nvs,      data, nvs,     ,        0x6000,
     phy_init, data, phy,     ,        0x1000,
     factory,  app,  factory, ,        0x3F0000,
 
-### 8. Сборка проекта
+### 9. Сборка проекта
     idf.py fullclean
     Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue
     idf.py build
 
-### 9. Прошивка
+### 10. Прошивка
     idf.py -p COM10 flash
     Замените COM10 на ваш COM-порт.
 
-### 10. Мониторинг
+### 11. Мониторинг
     idf.py -p COM10 monitor
 
 
