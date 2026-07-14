@@ -85,7 +85,7 @@
     
     4.5. Выбрать Custom partition table CSV
         Partition Table → Partition Table (Custom partition table CSV) → Custom partition table CSV
-         Убедиться что появился  пункт - в скобках имя вашего файла с настройками
+         Убедиться что появился  пункт (в скобках имя вашего файла с настройками)
         Partition Table → (partitions.csv) Custom partition CSV file
 
 ### 5. Настройка файла main\idf_component.yml
