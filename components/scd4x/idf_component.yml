@@ -1,0 +1,40 @@
+dependencies:
+  idf:
+    version: '>=5.2.0'
+description: ESP-IDF component for Sensirion SCD4x CO2, temperature, and humidity
+  sensor over I2C
+documentation: https://github.com/jef-sure/esp32-component-scd4x/blob/main/README.md
+files:
+  exclude:
+  - build/**
+  - dist/**
+  - .git/**
+  - .vscode/**
+  - '**/*.old'
+  include:
+  - src/**/*.c
+  - include/**/*.h
+  - CMakeLists.txt
+  - examples/**/*.c
+  - examples/**/*.h
+  - examples/CMakeLists.txt
+  - examples/sdkconfig
+  - README.md
+  - LICENSE
+issues: https://github.com/jef-sure/esp32-component-scd4x/issues
+license: MIT
+maintainers:
+- Anton Petrusevich <anton.petrusevich.mobile@gmail.com>
+repository: https://github.com/jef-sure/esp32-component-scd4x.git
+tags:
+- scd4x
+- scd40
+- scd41
+- scd43
+- co2
+- temperature
+- humidity
+- sensor
+- i2c
+url: https://github.com/jef-sure/esp32-component-scd4x
+version: 0.0.3
