@@ -1026,6 +1026,10 @@ static void scd41_task(void *arg)
     }
 
     ESP_LOGI(TAG, "SCD41 ready (SDA=%d SCL=%d)", SCD41_I2C_SDA, SCD41_I2C_SCL);
+    
+    int64_t last_mqtt_send_us = 0;
+    const int64_t mqtt_interval_us = 5000 * 1000; // 5 секунд в микросекундах
+
     for (;;) {
         app_settings_t settings;
         app_settings_get_snapshot(&settings);
@@ -1052,8 +1056,7 @@ static void scd41_task(void *arg)
             state.co2_ppm            = (uint16_t)clamp_int((int)lroundf(co2), 0, SENSOR_CO2_MAX_PPM);
             state.temperature_deci_c = (int16_t)lroundf(temp * 10.0f);
             state.humidity_deci_rh   = (uint16_t)lroundf(hum * 10.0f);
-            // ESP_LOGI(TAG, "RAW [corrected] measurement: CO2=%u ppm, T=%.2f C, RH=%.2f %%", (unsigned)state.co2_ppm,
-            // temp, hum);
+            
             lq_filter[lq_index] = state;
             lq_index            = (lq_index + 1) % LQ_FILTER_SIZE;
             if (lq_capacity < LQ_FILTER_SIZE) {
@@ -1064,18 +1067,26 @@ static void scd41_task(void *arg)
                 state.co2_ppm += lq_filter[i].co2_ppm;
             }
             state.co2_ppm /= lq_capacity;
+            
             (void)xQueueOverwrite(s->queue, &state);
-            if (app_wifi_is_provisioned()) {
-                has_rssi_dbm = app_wifi_get_rssi_dbm(&rssi_dbm);
-                app_mqtt_publish_measurement( //
-                    &settings,                //
-                    state.co2_ppm,            //
-                    state.temperature_deci_c, //
-                    state.humidity_deci_rh,   //
-                    has_rssi_dbm,             //
-                    rssi_dbm                  //
-                );
+            
+            // Отправка MQTT отдельно, раз в 5 секунд
+            int64_t now = esp_timer_get_time();
+            if (now - last_mqtt_send_us >= mqtt_interval_us) {
+                if (app_wifi_is_provisioned()) {
+                    has_rssi_dbm = app_wifi_get_rssi_dbm(&rssi_dbm);
+                    app_mqtt_publish_measurement( //
+                        &settings,                //
+                        state.co2_ppm,            //
+                        state.temperature_deci_c, //
+                        state.humidity_deci_rh,   //
+                        has_rssi_dbm,             //
+                        rssi_dbm                  //
+                    );
+                }
+                last_mqtt_send_us = now;
             }
+            
             if (has_rssi_dbm) {
                 ESP_LOGI(TAG, "CO2=%u ppm, T=%.2f C, RH=%.2f %%, RSSI=%d dBm", (unsigned)state.co2_ppm, temp, hum,
                          (int)rssi_dbm);
@@ -1085,7 +1096,7 @@ static void scd41_task(void *arg)
         } else if (err != ESP_ERR_NOT_FINISHED) {
             ESP_LOGW(TAG, "SCD41 read failed: %s", esp_err_to_name(err));
         }
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelay(pdMS_TO_TICKS(5000)); // 5 секунд задержка
     }
 }
 
